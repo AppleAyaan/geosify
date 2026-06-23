@@ -3,8 +3,6 @@
 # Geosify
 
 ### find tomorrow's land, today. 🏝️
-
-<!-- Edit this file on GitHub, place your cursor on the line below, then drag in public/videos/readme/geosify_readme_demo.mp4. GitHub will insert a playable URL — delete this comment and keep that URL on its own line. -->
-
+<img width="1470" height="802" alt="Screenshot 2026-06-22 at 11 03 53 PM" src="https://github.com/user-attachments/assets/a8179b38-0203-4e9e-8240-1f45a18d5a1f" />
 
 </div>
