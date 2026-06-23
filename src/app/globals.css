@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "mapbox-gl/dist/mapbox-gl.css";
 
 :root {
   --background: #f7f5f1;
@@ -271,8 +270,8 @@ body {
   border: 1px solid rgba(22, 163, 74, 0.15);
 }
 
-.mapboxgl-ctrl-logo,
-.mapboxgl-ctrl-attrib {
+.maplibregl-ctrl-logo,
+.maplibregl-ctrl-attrib {
   opacity: 0.5;
 }
 

@@ -1,5 +1,5 @@
-import type mapboxgl from "mapbox-gl";
-import type { MapStyleKey } from "@/lib/mapbox/config";
+import type { ExpressionSpecification, GeoJSONSource, Map, SymbolLayerSpecification } from "maplibre-gl";
+import type { MapStyleKey } from "@/lib/map/config";
 import {
   PARCEL_SOURCE_ID,
   PARCEL_FILL_LAYER,
@@ -8,7 +8,7 @@ import {
   PARCEL_HIGHLIGHT_LINE,
   PARCEL_LABEL_PRICE_LAYER,
   PARCEL_LABEL_SCORE_LAYER,
-} from "@/lib/mapbox/config";
+} from "@/lib/map/config";
 import type { ParcelFeatureCollection } from "@/lib/types/parcel";
 
 export interface ParcelPaintConfig {
@@ -73,10 +73,15 @@ const LABEL_STYLE: Record<
   },
 };
 
-function addParcelLabelLayers(map: mapboxgl.Map, style: MapStyleKey) {
+const LABEL_FONTS = {
+  price: ["Open Sans Bold", "Arial Unicode MS Bold"],
+  body: ["Open Sans Regular", "Arial Unicode MS Regular"],
+} as const;
+
+function addParcelLabelLayers(map: Map, style: MapStyleKey) {
   const labels = LABEL_STYLE[style];
-  const sharedLayout: mapboxgl.SymbolLayerSpecification["layout"] = {
-    "text-font": ["DIN Pro Medium", "Arial Unicode MS Bold"],
+  const sharedLayout: SymbolLayerSpecification["layout"] = {
+    "text-font": [...LABEL_FONTS.body],
     "text-anchor": "center",
     "text-allow-overlap": true,
     "text-ignore-placement": true,
@@ -92,7 +97,7 @@ function addParcelLabelLayers(map: mapboxgl.Map, style: MapStyleKey) {
       layout: {
         ...sharedLayout,
         "text-field": ["get", "priceLabel"],
-        "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
+        "text-font": [...LABEL_FONTS.price],
         "text-size": ["interpolate", ["linear"], ["zoom"], 12, 14, 14, 16, 16, 18],
         "text-offset": [0, -1],
       },
@@ -125,7 +130,7 @@ function addParcelLabelLayers(map: mapboxgl.Map, style: MapStyleKey) {
   }
 }
 
-export function applyParcelLabelColors(map: mapboxgl.Map, style: MapStyleKey) {
+export function applyParcelLabelColors(map: Map, style: MapStyleKey) {
   const labels = LABEL_STYLE[style];
   if (!map.getLayer(PARCEL_LABEL_PRICE_LAYER)) return;
 
@@ -144,7 +149,7 @@ export const PARCEL_INTERACTIVE_LAYERS = [
 ] as const;
 
 export function addParcelLayers(
-  map: mapboxgl.Map,
+  map: Map,
   data: ParcelFeatureCollection,
   style: MapStyleKey,
   selectedId = "",
@@ -158,7 +163,7 @@ export function addParcelLayers(
       generateId: true,
     });
   } else {
-    const source = map.getSource(PARCEL_SOURCE_ID) as mapboxgl.GeoJSONSource;
+    const source = map.getSource(PARCEL_SOURCE_ID) as GeoJSONSource;
     source.setData(data);
   }
 
@@ -218,7 +223,7 @@ export function addParcelLayers(
   applyParcelLabelColors(map, style);
 }
 
-export function applyParcelPaintColors(map: mapboxgl.Map, style: MapStyleKey) {
+export function applyParcelPaintColors(map: Map, style: MapStyleKey) {
   const paint = getParcelPaint(style);
 
   if (map.getLayer(PARCEL_FILL_LAYER)) {
@@ -261,7 +266,7 @@ export function buildDefaultFillOpacity(
       ["==", ["get", "id"], selectedId],
       paint.fillOpacitySelected,
       paint.fillOpacity,
-    ] as mapboxgl.Expression;
+    ] as ExpressionSpecification;
   }
 
   return [
@@ -269,7 +274,7 @@ export function buildDefaultFillOpacity(
     ["==", ["get", "id"], selectedId],
     paint.fillOpacitySelected,
     paint.fillOpacity,
-  ] as mapboxgl.Expression;
+  ] as ExpressionSpecification;
 }
 
 export function buildFilteredFillOpacity(
@@ -286,5 +291,5 @@ export function buildFilteredFillOpacity(
     paint.fillOpacitySelected,
     paint.fillOpacity,
     paint.fillOpacityDimmed,
-  ] as mapboxgl.Expression;
+  ] as ExpressionSpecification;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Layers, LocateFixed, Minus, Plus } from "lucide-react";
-import { WATERLOO_CENTER, DEFAULT_ZOOM } from "@/lib/mapbox/config";
+import { WATERLOO_CENTER, DEFAULT_ZOOM } from "@/lib/map/config";
 import { useAppStore } from "@/store/app-store";
 
 function GlassIconButton({

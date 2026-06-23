@@ -1,11 +1,11 @@
 "use client";
 
+import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useCallback, useState } from "react";
-import mapboxgl from "mapbox-gl";
+import maplibregl from "maplibre-gl";
 import { matchesFilters } from "@/lib/utils/filters";
 import { parcelRepository } from "@/lib/data/parcel-repository";
 import {
-  MAPBOX_TOKEN,
   WATERLOO_CENTER,
   DEFAULT_ZOOM,
   SELECTED_ZOOM,
@@ -14,13 +14,13 @@ import {
   PARCEL_HIGHLIGHT_FILL,
   PARCEL_HIGHLIGHT_LINE,
   type MapStyleKey,
-} from "@/lib/mapbox/config";
+} from "@/lib/map/config";
 import {
   addParcelLayers,
   buildDefaultFillOpacity,
   buildFilteredFillOpacity,
   PARCEL_INTERACTIVE_LAYERS,
-} from "@/lib/mapbox/parcel-layers";
+} from "@/lib/map/parcel-layers";
 import { getCentroid } from "@/lib/utils/geo";
 import { useAppStore } from "@/store/app-store";
 import { cn } from "@/lib/utils/cn";
@@ -41,7 +41,7 @@ export function MapCanvas({
   onDemoParcelSelect,
 }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
   const skipStyleSwapRef = useRef(true);
   const isPreview = variant === "preview";
 
@@ -73,7 +73,7 @@ export function MapCanvas({
 
   const applyParcelState = useCallback(
     (
-      map: mapboxgl.Map,
+      map: maplibregl.Map,
       styleKey: MapStyleKey,
       selectedId: string,
       hoveredId: string | null,
@@ -112,17 +112,16 @@ export function MapCanvas({
   );
 
   useEffect(() => {
-    if (!containerRef.current || !MAPBOX_TOKEN) return;
+    if (!containerRef.current) return;
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
     const initialStyle = useAppStore.getState().mapStyle;
 
-    const map = new mapboxgl.Map({
+    const map = new maplibregl.Map({
       container: containerRef.current,
       style: MAP_STYLES[initialStyle],
       center: WATERLOO_CENTER,
       zoom: isPreview ? 12.5 : DEFAULT_ZOOM,
-      attributionControl: !isPreview,
+      ...(isPreview ? { attributionControl: false as const } : {}),
       interactive: true,
       scrollZoom: false,
       boxZoom: false,
@@ -157,7 +156,7 @@ export function MapCanvas({
     };
 
     const handleParcelClick = (
-      e: mapboxgl.MapMouseEvent & { features?: mapboxgl.MapboxGeoJSONFeature[] },
+      e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] },
     ) => {
       const feature = e.features?.[0];
       if (!feature?.properties?.id) return;
@@ -171,7 +170,7 @@ export function MapCanvas({
     };
 
     const handleParcelEnter = (
-      e: mapboxgl.MapMouseEvent & { features?: mapboxgl.MapboxGeoJSONFeature[] },
+      e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] },
     ) => {
       map.getCanvas().style.cursor = "pointer";
       const id = e.features?.[0]?.properties?.id as string | undefined;
@@ -321,25 +320,6 @@ export function MapCanvas({
       }
     });
   }, [isPreview, mapStyle, applyParcelState, selectParcel, setHoveredParcelId, flyToParcel]);
-
-  if (!MAPBOX_TOKEN) {
-    return (
-      <div
-        className={cn(
-          "glass-panel flex h-full w-full items-center justify-center p-6 text-center",
-          className,
-        )}
-      >
-        <div>
-          <p className="mb-1 text-sm font-medium text-foreground">Map unavailable</p>
-          <p className="text-xs text-muted">
-            Add <code className="text-accent">NEXT_PUBLIC_MAPBOX_TOKEN</code> to
-            your <code>.env.local</code> file.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div

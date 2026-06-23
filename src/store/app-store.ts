@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { defaultFilters, type ParcelFilters } from "@/lib/types/filters";
 import type { ParcelId } from "@/lib/types/parcel";
-import type { MapStyleKey } from "@/lib/mapbox/config";
+import type { MapStyleKey } from "@/lib/map/config";
 
 interface AppState {
   selectedParcelId: ParcelId | null;

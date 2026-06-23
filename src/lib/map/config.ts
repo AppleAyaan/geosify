@@ -1,4 +1,5 @@
-export const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
+import type { StyleSpecification } from "maplibre-gl";
+import { SATELLITE_STYLE } from "@/lib/map/satellite-style";
 
 export const WATERLOO_CENTER: [number, number] = [-80.5204, 43.4643];
 
@@ -6,9 +7,9 @@ export const DEFAULT_ZOOM = 13;
 export const SELECTED_ZOOM = 16;
 
 export const MAP_STYLES = {
-  light: "mapbox://styles/mapbox/light-v11",
-  satellite: "mapbox://styles/mapbox/satellite-streets-v12",
-} as const;
+  light: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+  satellite: SATELLITE_STYLE,
+} as const satisfies Record<string, string | StyleSpecification>;
 
 export type MapStyleKey = keyof typeof MAP_STYLES;
 
